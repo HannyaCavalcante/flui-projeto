@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flui | Plataforma de recarga inteligente</title>
+    <link rel="stylesheet" href="landing.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="Página inicial Flui">
+        <img src="assets/flui-logo-purple.svg" alt="Flui" />
+      </a>
+      <nav class="nav-links" aria-label="Navegação principal">
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#motorista">Motorista</a>
+        <a href="./colaborador.html">Colaborador</a>
+        <a href="./admin.html">Admin</a>
+      </nav>
+      <button class="theme-button" id="themeToggle" type="button">Tema claro</button>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <p class="eyebrow">Charge Platform Challenge</p>
+          <h1 id="heroTitle">
+            <img class="hero-logo-title" src="assets/flui-logo-purple.svg" alt="Flui" />
+          </h1>
+          <p>
+            Uma experiência para motoristas encontrarem carregadores disponíveis, evitarem filas e
+            planejarem a rota com dados úteis de potência, preço, conectores e comodidades.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="./mobile.html">Abrir app do motorista</a>
+            <a class="secondary-action" href="./colaborador.html">Acesso colaborador</a>
+          </div>
+        </div>
+
+        <div class="app-preview" aria-label="Prévia do app Flui">
+          <div class="phone-shell">
+            <div class="phone-header">
+              <img class="phone-logo-purple" src="assets/flui-logo-purple.svg" alt="Flui" />
+              <span>65% bateria</span>
+            </div>
+            <div class="map-card">
+              <span class="road road-one"></span>
+              <span class="road road-two"></span>
+              <span class="road road-three"></span>
+              <i class="marker marker-one"></i>
+              <i class="marker marker-two"></i>
+              <i class="marker marker-three"></i>
+            </div>
+            <article class="station-card is-active">
+              <div>
+                <strong>Shopping Eldorado</strong>
+                <span>0.8 km • 150 kW</span>
+              </div>
+              <b>3/6 livres</b>
+            </article>
+            <article class="station-card">
+              <div>
+                <strong>Tesla Supercharger</strong>
+                <span>2.5 km • 250 kW</span>
+              </div>
+              <b>8/12 livres</b>
+            </article>
+            <article class="battery-card">
+              <img class="ai-bolt-icon" src="assets/ai-bolt.svg" alt="IA" />
+              <p>Recarregue em 45 km para chegar com autonomia e evitar horários de pico.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="steps" id="como-funciona" aria-labelledby="stepsTitle">
+        <div class="section-heading">
+          <p class="eyebrow">Fluxo principal</p>
+          <h2 id="stepsTitle">Do mapa à recarga em poucos toques.</h2>
+        </div>
+        <div class="step-grid">
+          <article>
+            <span>1</span>
+            <h3>Veja disponibilidade</h3>
+            <p>Compare pontos próximos com vagas livres, fila estimada, potência e preço por kWh.</p>
+          </article>
+          <article>
+            <span>2</span>
+            <h3>Filtre por necessidade</h3>
+            <p>Encontre conectores CCS2, Tipo 2 ou CHAdeMO e priorize café, banheiro ou Wi-Fi.</p>
+          </article>
+          <article>
+            <span>3</span>
+            <h3>Trace a rota</h3>
+            <p>Abra a navegação externa e acompanhe recomendações inteligentes para a bateria.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="driver-section" id="motorista" aria-labelledby="driverTitle">
+        <div class="driver-copy">
+          <p class="eyebrow">App mobile</p>
+          <h2 id="driverTitle">Pensado para quem dirige elétrico todo dia.</h2>
+          <p>
+            O protótipo já inclui login, mapa, busca, filtros, ficha detalhada do ponto e perfil com
+            progresso do motorista.
+          </p>
+        </div>
+        <div class="feature-list">
+          <article>
+            <strong>Mapa com pontos simulados</strong>
+            <span>Integração visual com OpenStreetMap e seleção rápida de estações.</span>
+          </article>
+          <article>
+            <strong>Dados operacionais claros</strong>
+            <span>Status, horário, conectores, potência, comodidades e confirmação dos usuários.</span>
+          </article>
+          <article>
+            <strong>Painel para equipe</strong>
+            <span>Área administrativa para cadastrar, editar e acompanhar avaliações dos pontos.</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="collab-cta" aria-label="Acesso para equipe Flui">
+        <div>
+          <p class="eyebrow">Operação</p>
+          <h2>Painel colaborador e admin prontos para demonstração.</h2>
+          <p>Use os links abaixo para alternar entre a visão do motorista e a visão da equipe.</p>
+        </div>
+        <a class="primary-action" href="./admin.html">Abrir painel admin</a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-brand">
+        <img src="assets/flui-logo-purple.svg" alt="Flui" />
+        <p>Protótipo funcional estático.</p>
+      </div>
+      <nav aria-label="Links do rodapé">
+        <a href="./mobile.html">App</a>
+        <a href="./colaborador.html">Colaborador</a>
+        <a href="./admin.html">Admin</a>
+      </nav>
+      <div class="footer-meta">
+        <strong><img class="inline-logo footer-inline-logo" src="assets/flui-logo-purple.svg" alt="Flui" /> Charge Platform</strong>
+        <span>Motoristas, recargas e operação em uma mesma experiência.</span>
+      </div>
+    </footer>
+
+    <script src="site.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "Flui Charge",
+  "short_name": "Flui",
+  "start_url": "/mobile.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080e19",
+  "theme_color": "#080e19",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/assets/flui-logo-purple.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

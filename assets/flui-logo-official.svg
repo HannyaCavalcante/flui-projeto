@@ -1,0 +1,25 @@
+<svg width="680" height="426" viewBox="0 0 680 426" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">Flui</title>
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(342 186) rotate(90) scale(220 355)">
+      <stop stop-color="#A11AF2"/>
+      <stop offset="0.52" stop-color="#8917E7"/>
+      <stop offset="1" stop-color="#5D17C5" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-25%" y="-35%" width="150%" height="170%">
+      <feGaussianBlur stdDeviation="30" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.56 0 0 0 0 0.08 0 0 0 0 1 0 0 0 0.8 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="32" y="42" width="616" height="302" rx="62" fill="url(#bg)"/>
+  <g filter="url(#softGlow)" fill="#fff">
+    <path d="M162 160c38 0 58-18 81-38 31-28 66-59 138-59h16l-29 45h-9c-52 0-75 20-100 42-25 22-52 47-97 47h-33v-37h33Z"/>
+    <path d="M164 183c-31 0-56 25-56 56s25 56 56 56 56-25 56-56-25-56-56-56Zm0 75c-11 0-20-9-20-20s9-20 20-20 20 9 20 20-9 20-20 20Z"/>
+    <text x="254" y="267" font-family="Georgia, 'Times New Roman', serif" font-size="150" font-style="italic" font-weight="700">lui</text>
+    <circle cx="508" cy="136" r="19"/>
+  </g>
+</svg>

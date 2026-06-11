@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#080e19" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Flui" />
+    <title>Flui App Mobile</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="stylesheet" href="mobile.css?v=3" />
+  </head>
+  <body class="mobile-body">
+    <main class="mobile-app">
+      <section class="login-screen" id="loginScreen" aria-label="Login do app Flui">
+        <div class="login-brand">
+          <img class="exact-logo mobile-login-logo" src="assets/flui-logo-purple.svg" alt="Flui" />
+          <h1>Bem-vindo</h1>
+          <p>Entre para continuar</p>
+        </div>
+
+        <div class="social-login">
+          <button class="auth-button" type="button" data-login data-login-provider="Google">
+            <span class="google-mark">G</span>
+            Continuar com Google
+          </button>
+          <button class="auth-button" type="button" data-login data-login-provider="Apple">
+            <span class="apple-mark">Apple</span>
+            Continuar com Apple
+          </button>
+          <button class="primary-button biometric" type="button" data-login data-login-provider="Face ID">Face ID / Touch ID</button>
+        </div>
+
+        <div class="divider"><span>ou</span></div>
+
+        <form class="login-form" id="loginForm">
+          <label>Email <input id="loginEmail" type="email" placeholder="Email" autocomplete="email" /></label>
+          <label>Senha <input id="loginPassword" type="password" placeholder="Senha" autocomplete="current-password" /></label>
+          <button class="primary-button" type="submit">Entrar</button>
+        </form>
+        <p class="signup-line">Não tem conta? <button type="button" data-login data-login-provider="Cadastro">Cadastre-se</button></p>
+      </section>
+
+      <section class="app-shell hidden" id="appShell" aria-label="Aplicativo Flui">
+        <section class="app-tab active" id="mapTab" aria-label="Mapa">
+
+          <!-- Barra de busca no topo -->
+          <div class="map-search-bar">
+            <span class="map-search-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input id="mapSearchInput" type="search" placeholder="Buscar posto, endereço…" autocomplete="off" />
+            <button class="map-filter-btn" id="mapFilterToggle" type="button" aria-label="Filtros">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            </button>
+          </div>
+
+          <!-- Filtros colapsáveis -->
+          <div class="map-filter-panel" id="mapFilterPanel">
+            <select id="mapConnectorFilter">
+              <option value="all">Todos os conectores</option>
+              <option value="CCS2">CCS2</option>
+              <option value="Tipo 2">Tipo 2</option>
+              <option value="CHAdeMO">CHAdeMO</option>
+            </select>
+            <select id="mapPowerFilter">
+              <option value="0">Qualquer potência</option>
+              <option value="50">50 kW+</option>
+              <option value="100">100 kW+</option>
+              <option value="150">150 kW+</option>
+            </select>
+            <select id="mapStatusFilter">
+              <option value="all">Qualquer status</option>
+              <option value="available">Com vagas</option>
+              <option value="Ativo">Apenas ativos</option>
+            </select>
+          </div>
+
+          <header class="dashboard-card">
+            <div class="battery-card">
+              <span class="battery-icon"></span>
+              <div><strong>65%</strong><span>Bateria</span></div>
+              <div><strong>245 km</strong><span>Autonomia</span></div>
+            </div>
+            <div class="ai-card">
+              <img class="ai-bolt-icon" src="assets/ai-bolt.svg" alt="IA" />
+              <div>
+                <strong>Recomendação IA</strong>
+                <p>Com sua rota, recarregue em 45 km no Tesla Supercharger para evitar filas.</p>
+              </div>
+              <button class="round-action" type="button" aria-label="Abrir rota">↗</button>
+            </div>
+          </header>
+
+          <section class="mobile-map tall-map" aria-label="Mapa interativo com pontos de recarga">
+            <iframe
+              id="mapFrame"
+              title="Mapa com pontos de recarga em São Paulo"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-46.704%2C-23.596%2C-46.612%2C-23.526&layer=mapnik&marker=-23.561%2C-46.655"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="map-pins" id="mapPins"></div>
+            <a class="map-open-link" id="mapOpenLink" target="_blank" rel="noreferrer" href="https://www.openstreetmap.org">Abrir mapa</a>
+            <div class="map-alert-chips" id="mapAlertChips"></div>
+          </section>
+
+          <div class="section-heading">
+            <h2>Pontos próximos</h2>
+            <span id="mapResultCount" class="map-result-count"></span>
+          </div>
+          <section class="station-list compact" id="nearbyList" aria-label="Pontos próximos"></section>
+        </section>
+
+        <!-- ══ ABA ROTA ══ -->
+        <section class="app-tab" id="routeTab" aria-label="Rota">
+          <header class="screen-title">
+            <h1>Planejar Rota</h1>
+          </header>
+
+          <div class="range-anxiety-card">
+            <div class="range-anxiety-bar">
+              <span class="range-icon">⚡</span>
+              <div class="range-info">
+                <strong id="routeBattLabel">65% • 245 km de autonomia</strong>
+                <small id="routeRangeStatus">Bateria suficiente para a maioria das rotas em SP</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="route-input-block">
+            <div class="route-point origin">
+              <span class="route-dot origin-dot"></span>
+              <span>São Paulo, SP (posição atual)</span>
+            </div>
+            <div class="route-line"></div>
+            <div class="route-point dest">
+              <span class="route-dot dest-dot"></span>
+              <input id="routeDest" type="text" placeholder="Para onde vai?" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="route-chip-row" id="routeChips">
+            <button class="chip active" data-route-filter="all">Todos</button>
+            <button class="chip" data-route-filter="fast">100 kW+</button>
+            <button class="chip" data-route-filter="free">Gratuitos</button>
+            <button class="chip" data-route-filter="available">Disponíveis</button>
+          </div>
+
+          <div class="alerts-block">
+            <h3>⚠ Alertas da comunidade</h3>
+            <div id="communityAlertsList"></div>
+          </div>
+
+          <div class="section-heading">
+            <h2>Estações na rota</h2>
+            <span id="routeCount"></span>
+          </div>
+          <section class="station-list" id="routeStationList" aria-label="Estações na rota"></section>
+        </section>
+
+        <section class="app-tab" id="searchTab" aria-label="Busca">
+          <header class="screen-title">
+            <h1>Buscar Carregadores</h1>
+            <input id="textFilter" type="search" placeholder="Buscar por local, endereço..." />
+          </header>
+          <button class="filter-toggle" id="filterToggle" type="button" aria-expanded="false">Filtros</button>
+
+          <section class="filter-panel search-filters" id="filterPanel" aria-label="Filtros de busca">
+            <label>
+              Conector
+              <select id="connectorFilter">
+                <option value="all">Todos</option>
+                <option value="CCS2">CCS2</option>
+                <option value="Tipo 2">Tipo 2</option>
+                <option value="CHAdeMO">CHAdeMO</option>
+              </select>
+            </label>
+            <label>
+              Potência mínima
+              <select id="powerFilter">
+                <option value="0">Todas</option>
+                <option value="22">22 kW+</option>
+                <option value="50">50 kW+</option>
+                <option value="120">120 kW+</option>
+              </select>
+            </label>
+            <label>
+              Comodidade
+              <select id="amenityFilter">
+                <option value="all">Todas</option>
+                <option value="Café">Café</option>
+                <option value="Banheiro">Banheiro</option>
+                <option value="Wi-Fi">Wi-Fi</option>
+                <option value="Mercado">Mercado</option>
+              </select>
+            </label>
+          </section>
+
+          <p class="result-count" id="resultCount"></p>
+          <section class="station-list" id="stationList" aria-label="Lista de pontos"></section>
+          <section class="station-detail" id="stationDetail" aria-live="polite"></section>
+        </section>
+
+        <!-- ══ ABA CONQUISTAS ══ -->
+        <section class="app-tab" id="rewardsTab" aria-label="Conquistas">
+          <header class="screen-title">
+            <h1>Conquistas</h1>
+          </header>
+
+          <!-- XP / Level card -->
+          <div class="xp-card">
+            <div class="xp-level-badge" id="rewardsLevel">12</div>
+            <div class="xp-details">
+              <strong id="rewardsLevelName">Nível 12 — Motorista Verde</strong>
+              <div class="xp-bar-track"><div class="xp-bar-fill" id="rewardsXpBar"></div></div>
+              <small id="rewardsXpLabel">780 / 1000 XP para o próximo nível</small>
+            </div>
+            <div class="xp-rank-badge" id="rewardsRank">#1</div>
+          </div>
+
+          <!-- Eco impact -->
+          <div class="eco-impact-card">
+            <h3>🌍 Impacto ambiental</h3>
+            <div class="eco-stats-row">
+              <div class="eco-stat"><strong id="ecoTrees">62</strong><span>🌳 árvores equiv.</span></div>
+              <div class="eco-stat"><strong id="ecoCO2">1.247</strong><span>kg CO₂ evitado</span></div>
+              <div class="eco-stat"><strong id="ecoKm">8.700</strong><span>km elétricos</span></div>
+            </div>
+          </div>
+
+          <!-- Weekly challenges -->
+          <div class="section-heading">
+            <h2>Desafios da semana</h2>
+            <span class="challenge-timer" id="challengeTimer">3d restantes</span>
+          </div>
+          <div id="challengesList" class="challenges-list"></div>
+
+          <!-- Leaderboard -->
+          <div class="section-heading">
+            <h2>Ranking eco</h2>
+            <button class="link-button" type="button">Ver completo</button>
+          </div>
+          <div id="leaderboardList" class="leaderboard-list"></div>
+
+          <!-- Badges -->
+          <div class="section-heading">
+            <h2>Badges</h2>
+            <span id="badgeCount" class="badge-count-label">0 / 12</span>
+          </div>
+          <div id="badgesGrid" class="badges-grid"></div>
+        </section>
+
+        <!-- ══ ABA COMUNIDADE ══ -->
+        <section class="app-tab" id="communityTab" aria-label="Comunidade">
+
+          <div class="community-header">
+            <div>
+              <h1>Comunidade</h1>
+              <p class="community-subtitle">Compre e venda elétricos</p>
+            </div>
+            <button class="primary-button community-post-btn" type="button" id="openPostListing">
+              + Anunciar
+            </button>
+          </div>
+
+          <!-- Busca -->
+          <div class="map-search-bar community-search">
+            <span class="map-search-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input id="communitySearch" type="search" placeholder="Marca, modelo, cidade…" autocomplete="off" />
+          </div>
+
+          <!-- Filtros de categoria -->
+          <div class="route-chip-row" id="communityChips">
+            <button class="chip active" data-comm-filter="all">Todos</button>
+            <button class="chip" data-comm-filter="sedan">Sedãs</button>
+            <button class="chip" data-comm-filter="suv">SUVs</button>
+            <button class="chip" data-comm-filter="hatch">Hatchbacks</button>
+            <button class="chip" data-comm-filter="below150">Até R$ 150k</button>
+            <button class="chip" data-comm-filter="above150">Acima R$ 150k</button>
+          </div>
+
+          <!-- Contador + ordenação -->
+          <div class="community-sort-row">
+            <span id="communityCount" class="map-result-count"></span>
+            <select id="communitySort" class="community-sort-select">
+              <option value="recent">Mais recentes</option>
+              <option value="price_asc">Menor preço</option>
+              <option value="price_desc">Maior preço</option>
+              <option value="km_asc">Menor km</option>
+              <option value="battery">Maior bateria</option>
+            </select>
+          </div>
+
+          <!-- Listagens -->
+          <div id="communityListings" class="community-listings"></div>
+        </section>
+
+        <!-- ══ OVERLAY ANUNCIAR ══ -->
+        <div class="post-overlay hidden" id="postListingOverlay">
+          <div class="post-sheet">
+            <div class="post-sheet-header">
+              <h2>Novo anúncio</h2>
+              <button class="carplay-close-btn" type="button" id="closePostListing">✕</button>
+            </div>
+            <form id="postListingForm" class="post-form">
+              <label>Modelo do carro
+                <select id="postModel">
+                  <option value="">Selecione o modelo</option>
+                  <option>Tesla Model 3</option>
+                  <option>Tesla Model Y</option>
+                  <option>BYD Dolphin</option>
+                  <option>BYD Seal</option>
+                  <option>Volvo XC40 Recharge</option>
+                  <option>GWM Ora 03</option>
+                  <option>Hyundai IONIQ 5</option>
+                  <option>BMW iX1</option>
+                  <option>Fiat 500e</option>
+                  <option>Renault Kwid E-Tech</option>
+                </select>
+              </label>
+              <div class="post-row">
+                <label>Ano
+                  <input type="number" id="postYear" placeholder="2023" min="2015" max="2026" />
+                </label>
+                <label>Km rodados
+                  <input type="number" id="postKm" placeholder="15000" min="0" />
+                </label>
+              </div>
+              <div class="post-row">
+                <label>Preço (R$)
+                  <input type="number" id="postPrice" placeholder="180000" min="0" />
+                </label>
+                <label>Saúde da bateria %
+                  <input type="number" id="postBattery" placeholder="97" min="0" max="100" />
+                </label>
+              </div>
+              <label>Cor
+                <input type="text" id="postColor" placeholder="Branco, Preto, Azul…" />
+              </label>
+              <label>Cidade
+                <input type="text" id="postCity" placeholder="São Paulo, SP" />
+              </label>
+              <label>Descrição
+                <textarea id="postDesc" rows="3" placeholder="Conte sobre o estado do carro, histórico de manutenção…"></textarea>
+              </label>
+              <button class="primary-button" type="submit">Publicar anúncio</button>
+            </form>
+          </div>
+        </div>
+
+        <section class="app-tab" id="profileTab" aria-label="Perfil">
+          <header class="profile-hero">
+            <div class="profile-title-row">
+              <h1>Perfil</h1>
+              <button class="settings-button" type="button" aria-label="Configurações" id="openSettings">⚙</button>
+            </div>
+            <div class="profile-user">
+              <img class="avatar-photo" src="assets/profile-carlos.svg" alt="Foto de Carlos Mendes" />
+              <div>
+                <h2 id="profileName"></h2>
+                <p id="profileEmail"></p>
+                <div class="chip-row">
+                  <span id="profileLevel"></span>
+                  <span id="profileCar"></span>
+                </div>
+              </div>
+            </div>
+            <div class="progress-card">
+              <div><strong>Progresso Nível 12</strong><strong id="progressValue"></strong></div>
+              <span class="progress-track"><span id="progressBar"></span></span>
+              <p>Faltam 13 recargas para o próximo nível</p>
+            </div>
+          </header>
+
+          <section class="profile-metrics" aria-label="Métricas do motorista">
+            <article><span>Recargas</span><strong id="profileCharges"></strong></article>
+            <article><span>kg CO₂ economizado</span><strong id="profileCo2"></strong></article>
+            <article><span>Eco Score</span><strong id="profileEco"></strong></article>
+            <article><span>Conquistas</span><strong id="profileAchievements"></strong></article>
+          </section>
+
+          <section class="achievements-panel">
+            <div class="section-heading">
+              <h2>Conquistas</h2>
+              <button class="link-button" type="button">Ver todas</button>
+            </div>
+            <div id="achievementsList" class="achievements-list"></div>
+          </section>
+        </section>
+
+        <section class="app-tab" id="settingsTab" aria-label="Ajustes do perfil">
+          <header class="settings-hero">
+            <div class="profile-title-row">
+              <button class="back-settings" type="button" id="closeSettings" aria-label="Voltar ao perfil">‹</button>
+              <h1>Ajustes</h1>
+              <span class="settings-spacer" aria-hidden="true"></span>
+            </div>
+            <div class="settings-account">
+              <img class="avatar-photo" src="assets/profile-carlos.svg" alt="Foto de Carlos Mendes" />
+              <div>
+                <strong id="settingsName"></strong>
+                <p id="settingsEmail"></p>
+              </div>
+            </div>
+          </header>
+
+          <section class="settings-panel" aria-label="Conta">
+            <h2>Conta</h2>
+            <label>
+              Nome
+              <input id="settingsNameField" type="text" value="Carlos Mendes" />
+            </label>
+            <label>
+              Email
+              <input id="settingsEmailField" type="email" value="carlos.mendes@email.com" />
+            </label>
+          </section>
+
+          <section class="settings-panel" aria-label="Veículo">
+            <h2>Veículo</h2>
+            <label>
+              Carro principal
+              <select id="settingsCarField">
+                <option>Tesla Model 3</option>
+                <option>BYD Dolphin</option>
+                <option>Volvo EX30</option>
+                <option>GWM Ora 03</option>
+              </select>
+            </label>
+            <label>
+              Conector preferido
+              <select>
+                <option>CCS2</option>
+                <option>Tipo 2</option>
+                <option>CHAdeMO</option>
+              </select>
+            </label>
+          </section>
+
+          <section class="settings-panel" aria-label="Preferências">
+            <h2>Preferências</h2>
+            <label class="setting-toggle">
+              <span>
+                <strong>Alertas de fila</strong>
+                <small>Avisar quando um ponto ficar lotado</small>
+              </span>
+              <input type="checkbox" checked />
+            </label>
+            <label class="setting-toggle">
+              <span>
+                <strong>Recomendações IA</strong>
+                <small>Sugerir paradas com base na rota</small>
+              </span>
+              <input type="checkbox" checked />
+            </label>
+            <label class="setting-toggle">
+              <span>
+                <strong>Modo econômico</strong>
+                <small>Priorizar pontos gratuitos ou mais baratos</small>
+              </span>
+              <input type="checkbox" />
+            </label>
+          </section>
+
+          <section class="settings-panel" aria-label="Multimídia">
+            <h2>Multimídia do carro</h2>
+            <p class="settings-hint">Ative o modo simplificado para CarPlay e Android Auto.</p>
+            <button class="carplay-launch-btn" type="button" id="openCarplay">
+              <span class="carplay-launch-icon">🚗</span>
+              Abrir Modo Carro
+            </button>
+          </section>
+
+          <section class="settings-actions">
+            <button class="primary-button" type="button" id="saveSettings">Salvar ajustes</button>
+            <button class="danger-button" type="button" id="logoutButton">Sair da conta</button>
+          </section>
+        </section>
+
+        <nav class="bottom-nav" aria-label="Navegação principal">
+          <button class="nav-item active" type="button" data-tab-target="map">
+            <img src="assets/icon-map.svg" alt="" aria-hidden="true" />
+            <span>Mapa</span>
+          </button>
+          <button class="nav-item" type="button" data-tab-target="route">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Rota</span>
+          </button>
+          <button class="nav-item" type="button" data-tab-target="community">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Comunidade</span>
+          </button>
+          <button class="nav-item" type="button" data-tab-target="rewards">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+            <span>Conquistas</span>
+          </button>
+          <button class="nav-item" type="button" data-tab-target="profile">
+            <img src="assets/icon-profile.svg" alt="" aria-hidden="true" />
+            <span>Perfil</span>
+          </button>
+        </nav>
+        <div class="action-toast" id="actionToast" role="status" aria-live="polite"></div>
+      </section>
+
+      <!-- ══ OVERLAY MODO CARRO / CARPLAY ══ -->
+      <div class="carplay-overlay hidden" id="carplayOverlay" role="dialog" aria-label="Modo Carro Flui">
+        <div class="carplay-header">
+          <img src="assets/flui-logo-purple.svg" alt="Flui" class="carplay-logo" />
+          <div class="carplay-batt-block">
+            <span class="carplay-batt-icon">⚡</span>
+            <strong id="carplayBattPct">65%</strong>
+            <small id="carplayRange">245 km</small>
+          </div>
+          <button class="carplay-close-btn" type="button" id="carplayClose" aria-label="Sair do modo carro">✕</button>
+        </div>
+
+        <div class="carplay-main">
+          <div class="carplay-station-card" id="carplayStationCard">
+            <div class="carplay-station-top">
+              <span class="carplay-avail" id="carplayAvail">3/6 livres</span>
+              <span class="carplay-dist" id="carplayDist">1.2 km</span>
+            </div>
+            <div class="carplay-station-name" id="carplayStName">Shopping Eldorado</div>
+            <div class="carplay-station-addr" id="carplayStAddr">Av. Rebouças, 3970 — Pinheiros</div>
+            <div class="carplay-eta-row">
+              <span>⏱ ETA: <strong id="carplayEta">8 min</strong></span>
+              <span>Espera: <strong id="carplayQueue">5 min</strong></span>
+            </div>
+          </div>
+
+          <div class="carplay-big-actions">
+            <button class="carplay-action-btn navigate" type="button" id="carplayNavigate">
+              <span>🧭</span>
+              Navegar
+            </button>
+            <button class="carplay-action-btn reserve" type="button" id="carplayReserve">
+              <span>⚡</span>
+              Reservar
+            </button>
+          </div>
+
+          <div class="carplay-station-row" id="carplayStationRow"></div>
+        </div>
+
+        <div class="carplay-footer">
+          <span>Flui Modo Carro</span>
+          <span class="carplay-compat">🍎 CarPlay &nbsp;•&nbsp; 🤖 Android Auto</span>
+        </div>
+      </div>
+    </main>
+    <script src="config.js?v=2"></script>
+    <script src="data.js?v=2"></script>
+    <script src="mobile.js?v=3"></script>
+  </body>
+</html>

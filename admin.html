@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flui — Painel Administrativo</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="admin-body">
+
+    <!-- ══ OVERLAY DE LOGIN ADMIN ══ -->
+    <div id="adminLoginOverlay" class="admin-login-overlay">
+      <div class="admin-login-box">
+        <img src="assets/flui-logo-purple.svg" alt="Flui" class="admin-login-logo" />
+        <h1>Acesso Administrativo</h1>
+        <p>Entre com suas credenciais da equipe Flui</p>
+        <form id="adminLoginForm" novalidate>
+          <label>
+            E-mail corporativo
+            <input type="email" id="adminEmail" placeholder="admin@flui.com" required />
+          </label>
+          <label>
+            Senha
+            <input type="password" id="adminPassword" placeholder="••••••••" required />
+          </label>
+          <button class="primary-button" type="submit">Entrar</button>
+          <p id="adminLoginError" class="login-error"></p>
+        </form>
+        <p class="login-hint"><a href="./index.html">← Voltar ao site</a></p>
+      </div>
+    </div>
+
+    <!-- ══ PAINEL PRINCIPAL ══ -->
+    <aside class="sidebar" id="adminSidebar">
+      <img class="exact-logo admin-sidebar-logo" src="assets/flui-logo-purple.svg" alt="Flui" />
+      <nav>
+        <a class="nav-link active" href="#" data-panel="pontos">Pontos</a>
+        <a class="nav-link" href="#" data-panel="relatorios">Relatórios</a>
+        <a class="nav-link" href="#" data-panel="motoristas">Motoristas</a>
+        <a class="nav-link nav-link-logout" href="#" id="adminLogoutBtn">Sair</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main" id="adminMain">
+
+      <!-- HEADER -->
+      <header class="admin-header">
+        <div class="admin-header-left">
+          <button class="hamburger-btn" id="sidebarToggle" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <div>
+            <p class="eyebrow">Equipe <img class="inline-logo admin-eyebrow-logo" src="assets/flui-logo-purple.svg" alt="Flui" /></p>
+            <h1 id="adminPanelTitle">Pontos de Recarga</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span id="adminUserName" class="admin-user-name"></span>
+          <button class="primary-button" id="newStationButton">Novo ponto</button>
+        </div>
+      </header>
+
+      <!-- MÉTRICAS -->
+      <section class="metrics-grid" aria-label="Indicadores da operação">
+        <article><span>Pontos ativos</span><strong id="metricStations">—</strong></article>
+        <article><span>Conectores</span><strong id="metricConnectors">—</strong></article>
+        <article><span>Avaliação média</span><strong id="metricRating">—</strong></article>
+        <article><span>Reservas totais</span><strong id="metricReservations">—</strong></article>
+        <article><span>Motoristas</span><strong id="metricDrivers">—</strong></article>
+        <article><span>Avaliações</span><strong id="metricReviews">—</strong></article>
+      </section>
+
+      <!-- ── PAINEL: PONTOS ── -->
+      <div id="panel-pontos">
+        <section class="admin-layout">
+          <div class="table-panel">
+            <div class="panel-title">
+              <h2>Pontos cadastrados</h2>
+              <input id="adminSearch" type="search" placeholder="Buscar ponto" />
+            </div>
+            <div class="responsive-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Conectores</th>
+                    <th>Potência</th>
+                    <th>Disponíveis</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTable"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <form class="editor-panel" id="stationForm">
+            <input type="hidden" id="stationId" />
+            <h2 id="formTitle">Cadastrar ponto</h2>
+            <label>Nome <input id="nameField" required /></label>
+            <label>Endereço <input id="addressField" required /></label>
+            <div class="form-row">
+              <label>Conectores <input id="connectorsField" placeholder="CCS2, Tipo 2" required /></label>
+              <label>Potência (kW) <input id="powerField" type="number" min="1" required /></label>
+            </div>
+            <div class="form-row">
+              <label>Total carregadores <input id="chargersField" type="number" min="1" value="4" /></label>
+              <label>Disponíveis agora <input id="availableField" type="number" min="0" value="4" /></label>
+            </div>
+            <label>Preço <input id="priceField" placeholder="R$ 2,50/kWh ou Grátis" /></label>
+            <label>Horário <input id="hoursField" placeholder="24 horas" required /></label>
+            <label>Comodidades <input id="amenitiesField" placeholder="Café, Wi-Fi, Banheiro" /></label>
+            <div class="form-row">
+              <label>Latitude <input id="latField" type="number" step="any" placeholder="-23.5505" /></label>
+              <label>Longitude <input id="lngField" type="number" step="any" placeholder="-46.6333" /></label>
+            </div>
+            <label>Status
+              <select id="statusField">
+                <option>Ativo</option>
+                <option>Manutenção</option>
+                <option>Em implantação</option>
+              </select>
+            </label>
+            <div class="form-actions">
+              <button class="primary-button" type="submit">Salvar ponto</button>
+              <button class="secondary-button" type="button" id="cancelFormBtn">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="reviews-panel">
+          <h2>Avaliações dos motoristas</h2>
+          <div id="reviewsList" class="reviews-list"></div>
+        </section>
+      </div>
+
+      <!-- ── PAINEL: RELATÓRIOS ── -->
+      <div id="panel-relatorios" class="hidden">
+        <section class="reports-section">
+          <div class="report-card wide">
+            <h3>Reservas nos últimos 7 dias</h3>
+            <canvas id="chartReservations" height="100"></canvas>
+          </div>
+          <div class="report-card">
+            <h3>Top pontos — Reservas</h3>
+            <table class="report-table">
+              <thead><tr><th>Ponto</th><th>Reservas</th></tr></thead>
+              <tbody id="reportByStation"></tbody>
+            </table>
+          </div>
+          <div class="report-card">
+            <h3>Top pontos — Avaliações</h3>
+            <table class="report-table">
+              <thead><tr><th>Ponto</th><th>Qtd</th><th>Média</th></tr></thead>
+              <tbody id="reportByReviews"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── PAINEL: MOTORISTAS ── -->
+      <div id="panel-motoristas" class="hidden">
+        <section class="table-panel">
+          <div class="panel-title">
+            <h2>Motoristas cadastrados</h2>
+            <input id="driversSearch" type="search" placeholder="Buscar motorista" />
+          </div>
+          <div class="responsive-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>E-mail</th>
+                  <th>Veículo</th>
+                  <th>Nível</th>
+                  <th>Recargas</th>
+                  <th>Eco Score</th>
+                  <th>Cadastro</th>
+                </tr>
+              </thead>
+              <tbody id="driversTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <script src="config.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>

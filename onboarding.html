@@ -1,0 +1,1097 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0820" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Flui — Bem-vindo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080e19;
+      --purple:    #9422e8;
+      --purple-lt: rgba(148,34,232,.12);
+      --panel:     #111827;
+      --panel-2:   #1a2540;
+      --line:      rgba(255,255,255,.09);
+      --text:      #f8fbff;
+      --muted:     #8a96aa;
+      --green:     #2abf66;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      background: #050814;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100svh;
+    }
+
+    /* ── Phone shell ── */
+    .frame {
+      width: min(100vw, 390px);
+      height: 100svh;
+      max-height: 844px;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ── Screen system ── */
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(110%);
+      transition: transform .38s cubic-bezier(.4,0,.2,1);
+      will-change: transform;
+      overflow: hidden;
+    }
+    .screen.active  { transform: translateX(0); z-index: 2; }
+    .screen.exit    { transform: translateX(-110%); z-index: 1; }
+
+    /* ── Splash ── */
+    #s-splash {
+      background: linear-gradient(175deg, #1c0c3c 0%, #0a0618 55%, var(--bg) 100%);
+      align-items: center;
+      justify-content: flex-end;
+      padding: 32px 32px calc(env(safe-area-inset-bottom) + 48px);
+      text-align: center;
+    }
+    .splash-upper {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding-top: 30%;
+    }
+    .splash-logo { width: 130px; margin-bottom: 10px; }
+    .splash-slogan { font-size: .88rem; color: var(--muted); margin-bottom: 0; }
+    .splash-actions { width: 100%; }
+    .btn-primary {
+      width: 100%;
+      padding: .88rem;
+      border-radius: 14px;
+      background: var(--purple);
+      border: none;
+      color: #fff;
+      font: 700 1rem/1 inherit;
+      cursor: pointer;
+      transition: filter .2s;
+      display: block;
+      text-align: center;
+    }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-primary:active { filter: brightness(.92); }
+    .btn-primary:disabled { opacity: .45; cursor: default; filter: none; }
+    .splash-login {
+      margin-top: 18px;
+      font-size: .84rem;
+      color: var(--muted);
+    }
+    .splash-login button {
+      background: none; border: none; color: var(--text);
+      font-weight: 700; cursor: pointer; text-decoration: underline;
+      font-size: inherit;
+    }
+
+    /* ── Shared layout ── */
+    .ob-back {
+      position: absolute;
+      top: 52px; left: 18px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 10;
+      font-size: 1.2rem; line-height: 1;
+      transition: background .2s;
+    }
+    .ob-back:hover { background: rgba(255,255,255,.1); }
+
+    .ob-head {
+      padding: 60px 24px 0;
+      flex-shrink: 0;
+    }
+    .ob-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      line-height: 1.2;
+      margin-bottom: 9px;
+      text-align: center;
+    }
+    .ob-title .hi { color: var(--purple); }
+    .ob-subtitle {
+      font-size: .82rem;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+
+    .ob-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0 24px 12px;
+      scrollbar-width: none;
+    }
+    .ob-scroll::-webkit-scrollbar { display: none; }
+
+    .ob-footer {
+      flex-shrink: 0;
+      padding: 14px 24px calc(env(safe-area-inset-bottom) + 18px);
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .btn-secondary {
+      width: 100%;
+      padding: .72rem;
+      border-radius: 12px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font: 600 .87rem/1 inherit;
+      cursor: pointer;
+      margin-top: 9px;
+      transition: background .2s, color .2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,.05); color: var(--text); }
+
+    /* ── Progress dots ── */
+    .ob-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .ob-dot {
+      height: 7px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.18);
+      transition: width .35s, background .35s;
+    }
+    .ob-dot.active { width: 22px !important; background: var(--purple); }
+    .ob-dot:not(.active) { width: 7px; }
+
+    /* ── Option cards (objetivo) ── */
+    .ob-option {
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+    }
+    .ob-option:hover  { border-color: rgba(148,34,232,.5); background: var(--purple-lt); }
+    .ob-option.sel    { border-color: var(--purple); background: var(--purple-lt); }
+    .ob-opt-icon {
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      background: rgba(148,34,232,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .ob-opt-text h3 { font-size: .9rem; font-weight: 700; margin-bottom: 4px; line-height: 1.25; }
+    .ob-opt-text p  { font-size: .74rem; color: var(--muted); line-height: 1.48; }
+    .ob-opt-radio {
+      margin-left: auto;
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.25);
+      transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ob-option.sel .ob-opt-radio {
+      border-color: var(--purple);
+      background: var(--purple);
+    }
+    .ob-option.sel .ob-opt-radio::after {
+      content: '';
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    /* ── Form elements ── */
+    .ob-label {
+      display: block;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .055em;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    .ob-select-wrap { position: relative; margin-bottom: 18px; }
+    .ob-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 14px; top: 50%;
+      transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--muted);
+      pointer-events: none;
+    }
+    .ob-select, .ob-input {
+      width: 100%;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--text);
+      padding: .72rem .9rem;
+      font: inherit; font-size: .88rem;
+      outline: none;
+      appearance: none;
+      transition: border-color .2s;
+    }
+    .ob-select:focus, .ob-input:focus { border-color: var(--purple); }
+
+    /* ── Checkbox list ── */
+    .ob-section-h { font-size: .88rem; font-weight: 700; margin: 4px 0 4px; }
+    .ob-section-p { font-size: .74rem; color: var(--muted); line-height: 1.5; margin-bottom: 12px; }
+    .ob-checks { display: flex; flex-direction: column; gap: 2px; }
+    .ob-check {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .ob-check:hover { background: rgba(255,255,255,.04); }
+    .ob-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--purple); flex-shrink: 0; }
+    .ob-check label { font-size: .88rem; cursor: pointer; }
+    .ob-add-btn {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 12px;
+      background: none; border: none;
+      color: var(--purple); font: 600 .84rem/1 inherit;
+      cursor: pointer;
+    }
+
+    /* ── Toggle row (Sim/Não) ── */
+    .ob-toggle-row { display: flex; gap: 8px; margin-bottom: 18px; }
+    .ob-toggle {
+      flex: 1; padding: .65rem;
+      border-radius: 12px;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font: 600 .92rem/1 inherit;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .ob-toggle.on { border-color: var(--purple); background: var(--purple-lt); color: var(--text); }
+
+    /* ── Range slider ── */
+    .ob-range {
+      width: 100%; appearance: none;
+      height: 4px; border-radius: 2px;
+      background: var(--panel-2);
+      outline: none; cursor: pointer;
+      accent-color: var(--purple);
+      margin: 6px 0 6px;
+    }
+    .ob-range::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 2px 8px rgba(148,34,232,.5);
+      cursor: pointer;
+    }
+    .ob-range-labels { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); margin-bottom: 18px; }
+    .ob-range-val { text-align: center; font-size: .85rem; font-weight: 800; color: var(--purple); margin-bottom: 10px; }
+
+    /* ── Car list ── */
+    .ob-search-wrap { position: relative; margin-bottom: 12px; }
+    .ob-search-wrap svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    .ob-search {
+      width: 100%; background: var(--panel);
+      border: 1px solid var(--line); border-radius: 12px;
+      color: var(--text); padding: .72rem .9rem .72rem 2.5rem;
+      font: inherit; font-size: .88rem; outline: none;
+      transition: border-color .2s;
+    }
+    .ob-search:focus { border-color: var(--purple); }
+    .ob-search::placeholder { color: var(--muted); }
+
+    .ob-car-list { display: flex; flex-direction: column; gap: 6px; }
+    .ob-car {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .ob-car:hover, .ob-car.sel { border-color: var(--purple); background: var(--purple-lt); }
+    .ob-car-l h4 { font-size: .9rem; font-weight: 700; margin-bottom: 2px; }
+    .ob-car-l span { font-size: .7rem; color: var(--muted); }
+    .ob-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+    .ob-tag {
+      font-size: .63rem; font-weight: 700;
+      padding: 2px 7px; border-radius: 6px; border: 1px solid;
+    }
+    .ob-tag.bl  { border-color: rgba(56,189,248,.35); color: #38bdf8; background: rgba(56,189,248,.08); }
+    .ob-tag.gr  { border-color: rgba(42,191,102,.35); color: #2abf66; background: rgba(42,191,102,.08); }
+    .ob-tag.gy  { border-color: var(--line); color: var(--muted); background: rgba(255,255,255,.04); }
+    .ob-tag.pu  { border-color: rgba(148,34,232,.35); color: #c070f0; background: rgba(148,34,232,.08); }
+    .ob-tag.or  { border-color: rgba(251,146,60,.35); color: #fb923c; background: rgba(251,146,60,.08); }
+
+    /* ── Vehicle card ── */
+    .ob-vcard {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 18px;
+    }
+    .ob-vcard-brand { font-size: .7rem; color: var(--muted); margin-bottom: 2px; }
+    .ob-vcard-name  { font-size: 1.05rem; font-weight: 800; margin-bottom: 9px; }
+
+    /* ── Address card ── */
+    .ob-addr-card {
+      display: flex; align-items: center; gap: 13px;
+      padding: 14px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: border-color .2s;
+      margin-bottom: 20px;
+    }
+    .ob-addr-card:hover { border-color: var(--purple); }
+    .ob-addr-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--purple-lt);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+    .ob-addr-lbl { font-size: .7rem; color: var(--muted); margin-bottom: 1px; }
+    .ob-addr-val { font-size: .88rem; font-weight: 700; }
+    .ob-addr-ok  { font-size: .7rem; color: var(--green); margin-top: 2px; }
+    .ob-addr-arr { margin-left: auto; color: var(--muted); font-size: 1.1rem; }
+
+    /* ── Loading screen ── */
+    #s-loading {
+      background: linear-gradient(175deg, #1c0c3c 0%, #0a0618 55%, var(--bg) 100%);
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+      text-align: center;
+    }
+    .ld-title {
+      font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;
+      letter-spacing: -.02em;
+    }
+    .ld-sub { font-size: .8rem; color: var(--muted); margin-bottom: 32px; line-height: 1.5; }
+    .ld-list { text-align: left; width: 100%; margin-bottom: 28px; }
+    .ld-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: .84rem;
+      margin-bottom: 3px;
+      transition: background .3s, opacity .4s;
+    }
+    .ld-item.done    { color: var(--text); }
+    .ld-item.pending { color: var(--muted); opacity: .55; }
+    .ld-item.running { color: var(--text); background: rgba(148,34,232,.07); }
+    .ld-ic {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .78rem; flex-shrink: 0;
+    }
+    .ld-item.done    .ld-ic { background: rgba(42,191,102,.15); color: var(--green); }
+    .ld-item.pending .ld-ic { background: rgba(255,255,255,.06); color: var(--muted); }
+    .ld-item.running .ld-ic { background: rgba(148,34,232,.18); color: var(--purple); animation: ld-pulse 1s ease-in-out infinite; }
+    @keyframes ld-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .ld-bar { width: 100%; height: 4px; background: rgba(255,255,255,.1); border-radius: 2px; overflow: hidden; }
+    .ld-fill { height: 100%; background: var(--purple); border-radius: 2px; width: 0%; transition: width .7s ease; }
+
+    /* ── Result screen ── */
+    #s-result { background: var(--bg); overflow-y: auto; }
+    .res-top {
+      background: linear-gradient(165deg, #1c0c3c 0%, #0a0618 100%);
+      padding: 52px 24px 30px;
+      text-align: center;
+    }
+    .res-body { padding: 18px 24px; }
+    .res-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      margin-bottom: 8px;
+    }
+    .res-ic {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .82rem; flex-shrink: 0;
+    }
+    .res-ic.done { background: rgba(42,191,102,.15); color: var(--green); }
+    .res-ic.spin { background: rgba(148,34,232,.15); color: var(--purple); animation: ld-pulse 1s infinite; }
+    .res-txt h4 { font-size: .85rem; font-weight: 700; margin-bottom: 2px; }
+    .res-txt p  { font-size: .7rem; color: var(--muted); }
+    .res-footer {
+      padding: 4px 24px calc(env(safe-area-inset-bottom) + 24px);
+    }
+    .res-more-link {
+      text-align: right; font-size: .74rem; color: var(--muted);
+      margin-bottom: 10px; cursor: pointer;
+    }
+    .res-more-link:hover { color: var(--purple); }
+
+    /* suggested car card */
+    .res-car-card {
+      background: var(--panel);
+      border: 1px solid rgba(148,34,232,.3);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex; gap: 14px; align-items: center;
+    }
+    .res-car-emoji { font-size: 2.8rem; flex-shrink: 0; }
+    .res-car-brand { font-size: .7rem; color: var(--muted); margin-bottom: 2px; }
+    .res-car-name  { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- ═══ SPLASH ═══ -->
+  <div class="screen active" id="s-splash">
+    <div class="splash-upper">
+      <img src="assets/flui-logo.svg" alt="Flui" class="splash-logo" />
+      <p class="splash-slogan">Imagina um slogan brabo aqui</p>
+    </div>
+    <div class="splash-actions">
+      <button class="btn-primary" id="btnStart">Começar</button>
+      <p class="splash-login">Já possui uma conta? <button type="button" id="btnLogin">Fazer Login.</button></p>
+    </div>
+  </div>
+
+  <!-- ═══ OBJETIVO ═══ -->
+  <div class="screen" id="s-objetivo">
+    <button class="ob-back" id="bkObjetivo">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Olá! Qual é o seu <span class="hi">objetivo?</span></h1>
+      <p class="ob-subtitle">Vamos personalizar sua experiência</p>
+    </div>
+    <div class="ob-scroll">
+      <div class="ob-option" id="optComprador" data-v="comprador">
+        <div class="ob-opt-icon">🚗</div>
+        <div class="ob-opt-text">
+          <h3>Quero comprar um carro elétrico</h3>
+          <p>Nós vamos preparar uma assessoria personalizada com IA para que você encontre o modelo ideal</p>
+        </div>
+        <div class="ob-opt-radio"></div>
+      </div>
+      <div class="ob-option" id="optProprietario" data-v="proprietario">
+        <div class="ob-opt-icon">⚡</div>
+        <div class="ob-opt-text">
+          <h3>Já tenho um carro elétrico</h3>
+          <p>Monitore, recarregue e receba resumos e informações através da IA da Flui</p>
+        </div>
+        <div class="ob-opt-radio"></div>
+      </div>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary" id="btnObjetivo" disabled>Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ MODELO DO VEÍCULO (proprietário) ═══ -->
+  <div class="screen" id="s-modelo">
+    <button class="ob-back" id="bkModelo">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Insira o modelo do<br>seu veículo</h1>
+      <p class="ob-subtitle">Isso ajuda a definir as configurações para melhorar sua experiência</p>
+    </div>
+    <div style="padding:6px 24px 10px; flex-shrink:0;">
+      <div class="ob-search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input class="ob-search" id="carSearch" placeholder="Buscar por modelo ou fabricante" type="search" autocomplete="off" />
+      </div>
+    </div>
+    <div class="ob-scroll" style="padding-top:0;">
+      <div class="ob-car-list" id="carList"></div>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary" id="btnModelo" disabled>Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ COMPLEMENTAR INFORMAÇÕES (proprietário) ═══ -->
+  <div class="screen" id="s-complementar">
+    <button class="ob-back" id="bkComplementar">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Estamos quase lá!</h1>
+      <p class="ob-subtitle">Insira as informações complementares para que nossas recomendações sejam assertivas</p>
+    </div>
+    <div class="ob-scroll">
+      <div id="compVcard" class="ob-vcard"></div>
+      <label class="ob-label">Selecione o ano de fabricação</label>
+      <div class="ob-select-wrap">
+        <select class="ob-select" id="vYear"></select>
+      </div>
+      <label class="ob-label">Selecione o modelo do veículo</label>
+      <div class="ob-select-wrap">
+        <select class="ob-select" id="vModel"></select>
+      </div>
+      <p style="font-size:.72rem;color:var(--muted);margin-top:4px">
+        Não sabe qual é o modelo?
+        <a href="#" style="color:var(--purple);font-weight:700;text-decoration:none" onclick="return false">Descubra aqui</a>
+      </p>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary" id="btnComplementar">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ CONFIRMAÇÃO VEÍCULO (proprietário) ═══ -->
+  <div class="screen" id="s-conf-veiculo">
+    <button class="ob-back" id="bkConfVeiculo">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Tudo pronto pra<br>continuar?</h1>
+      <p class="ob-subtitle">Verifique se o seu veículo está correto antes de prosseguir para a próxima etapa</p>
+    </div>
+    <div class="ob-scroll">
+      <div id="confVcard" class="ob-vcard"></div>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary" id="btnConfVeiculo">Continuar</button>
+      <button class="btn-secondary" id="btnTrocarVeiculo">Trocar seleção</button>
+    </div>
+  </div>
+
+  <!-- ═══ INFORMAÇÕES COMPLEMENTARES — endereço (proprietário) ═══ -->
+  <div class="screen" id="s-infos-comp">
+    <button class="ob-back" id="bkInfosComp">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Perfeito! Vamos <span class="hi">entender mais</span></h1>
+      <p class="ob-subtitle">Para personalizar as melhores opções para você, precisamos das informações à seguir</p>
+    </div>
+    <div class="ob-scroll">
+      <div class="ob-addr-card" id="addrCard">
+        <div class="ob-addr-icon">📍</div>
+        <div style="flex:1">
+          <div class="ob-addr-lbl">Seu endereço principal</div>
+          <div class="ob-addr-val">Santo Amaro, São Paulo - SP</div>
+          <div class="ob-addr-ok">✓ Concluído</div>
+        </div>
+        <span class="ob-addr-arr">›</span>
+      </div>
+    </div>
+    <div class="ob-footer">
+      <button class="btn-primary" id="btnInfosComp">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ ROTINA (ambos os fluxos) ═══ -->
+  <div class="screen" id="s-rotina">
+    <button class="ob-back" id="bkRotina">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Como é a sua <span class="hi">rotina?</span></h1>
+      <p class="ob-subtitle">Precisamos conhecer um pouco do seu dia a dia para entender melhor qual autonomia é ideal pro veículo que você costuma usar o veículo</p>
+    </div>
+    <div class="ob-scroll">
+      <label class="ob-label">Frequência de uso</label>
+      <p style="font-size:.74rem;color:var(--muted);margin:-12px 0 8px">Quantas vezes na semana você pretende utilizar o seu veículo com maior frequência</p>
+      <div class="ob-select-wrap">
+        <select class="ob-select" id="freq">
+          <option>Segunda à Sexta</option>
+          <option>Todos os dias</option>
+          <option>Finais de semana</option>
+          <option>Ocasionalmente</option>
+        </select>
+      </div>
+      <p class="ob-section-h">Conhecendo seu trajeto</p>
+      <p class="ob-section-p">Selecione algumas necessidades no uso do seu automóvel que vão ser comuns. Você também pode editar nossas sugestões como preferir</p>
+      <div class="ob-checks">
+        <div class="ob-check"><input type="checkbox" id="ck1" checked /><label for="ck1">Trajeto do trabalho</label></div>
+        <div class="ob-check"><input type="checkbox" id="ck2" /><label for="ck2">Trajeto da faculdade</label></div>
+        <div class="ob-check"><input type="checkbox" id="ck3" /><label for="ck3">Levar os filhos na escola</label></div>
+        <div class="ob-check"><input type="checkbox" id="ck4" /><label for="ck4">Viajar nos fins de semana</label></div>
+        <div class="ob-check"><input type="checkbox" id="ck5" /><label for="ck5">Motorista de aplicativo</label></div>
+      </div>
+      <button class="ob-add-btn" type="button">＋ Adicionar novo item</button>
+    </div>
+    <div class="ob-footer">
+      <div class="ob-dots" id="rotinaDots"></div>
+      <button class="btn-primary" id="btnRotina">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ PRÓXIMO CARRO (comprador) ═══ -->
+  <div class="screen" id="s-proximo">
+    <button class="ob-back" id="bkProximo">‹</button>
+    <div class="ob-head">
+      <h1 class="ob-title">Como é seu <span class="hi">próximo carro?</span></h1>
+      <p class="ob-subtitle">Tudo quase pronto! Conta pra gente um pouco mais sobre o carro que melhor se encaixa no que você quer</p>
+    </div>
+    <div class="ob-scroll">
+      <label class="ob-label">Negociação</label>
+      <p style="font-size:.74rem;color:var(--muted);margin:-12px 0 10px">Atualmente você possui outro carro ou veículo que deseja trocar por esse?</p>
+      <div class="ob-toggle-row">
+        <button class="ob-toggle" id="negSim">Sim</button>
+        <button class="ob-toggle on" id="negNao">Não</button>
+      </div>
+
+      <label class="ob-label">Orçamento disponível</label>
+      <p style="font-size:.74rem;color:var(--muted);margin:-12px 0 10px">Em média, qual é o valor do veículo que você busca comprar?</p>
+      <p class="ob-range-val" id="rangeVal">De R$ 90 a R$ 120 mil</p>
+      <input type="range" class="ob-range" id="budgetRange" min="60" max="800" step="10" value="120" />
+      <div class="ob-range-labels"><span>R$ 60k</span><span>R$ 800k+</span></div>
+
+      <label class="ob-label">Perfil de uso</label>
+      <p style="font-size:.74rem;color:var(--muted);margin:-12px 0 10px">Conta pra gente a categoria e o tipo de carro que você está procurando</p>
+      <div class="ob-select-wrap">
+        <select class="ob-select" id="perfilUso">
+          <option>SUV Compacto</option>
+          <option>Sedã</option>
+          <option>Hatchback</option>
+          <option>SUV Grande</option>
+          <option>Picape</option>
+          <option>Minivan</option>
+        </select>
+      </div>
+    </div>
+    <div class="ob-footer">
+      <div class="ob-dots" id="proximoDots"></div>
+      <button class="btn-primary" id="btnProximo">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ═══ LOADING ═══ -->
+  <div class="screen" id="s-loading">
+    <h2 class="ld-title">Preparando seu <span style="color:var(--purple)">Flui<span id="ldDots"></span></span></h2>
+    <p class="ld-sub">Aguarde enquanto estamos procurando algumas opções que se encaixam no seu perfil</p>
+    <div class="ld-list" id="ldList"></div>
+    <div class="ld-bar"><div class="ld-fill" id="ldFill"></div></div>
+  </div>
+
+  <!-- ═══ RESULTADO FINAL ═══ -->
+  <div class="screen" id="s-result">
+    <div class="res-top">
+      <h1 class="ob-title" style="font-size:1.3rem">Tudo pronto pra<br>continuar?</h1>
+      <p class="ob-subtitle" style="margin-bottom:0">Verifique se o seu veículo está correto antes de prosseguir para a próxima etapa</p>
+    </div>
+    <div class="res-body" id="resBody"></div>
+    <div class="res-footer">
+      <p class="res-more-link" id="verMais">Ver mais sugestões</p>
+      <button class="btn-primary" id="btnEnterApp">Entrar em contato</button>
+    </div>
+  </div>
+
+</div><!-- /frame -->
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+const CARS = [
+  { id:'dolphin-mini',  name:'Dolphin Mini',  brand:'BYD',        type:'Hatch', doors:'4', fuel:'Elétrico' },
+  { id:'dolphin-plus',  name:'Dolphin Plus',  brand:'BYD',        type:'Hatch', doors:'5', fuel:'Elétrico' },
+  { id:'yuan-pro',      name:'Yuan Pro',      brand:'BYD',        type:'SUV',   doors:'4', fuel:'Elétrico' },
+  { id:'seal',          name:'Seal',          brand:'BYD',        type:'Sedã',  doors:'4', fuel:'Elétrico' },
+  { id:'ora03',         name:'Ora 03',        brand:'GWM',        type:'Hatch', doors:'4', fuel:'Elétrico' },
+  { id:'ex30',          name:'EX30',          brand:'Volvo',      type:'SUV',   doors:'4', fuel:'Elétrico' },
+  { id:'kwid-etech',    name:'Kwid E-Tech',   brand:'Renault',    type:'Hatch', doors:'4', fuel:'Elétrico' },
+  { id:'model3',        name:'Model 3',       brand:'Tesla',      type:'Sedã',  doors:'4', fuel:'Elétrico' },
+  { id:'ioniq5',        name:'IONIQ 5',       brand:'Hyundai',    type:'SUV',   doors:'4', fuel:'Elétrico' },
+  { id:'id4',           name:'ID.4',          brand:'Volkswagen', type:'SUV',   doors:'4', fuel:'Elétrico' },
+  { id:'bolt',          name:'Bolt EV',       brand:'Chevrolet',  type:'Hatch', doors:'4', fuel:'Elétrico' },
+  { id:'ec6',           name:'EC6',           brand:'BYD',        type:'SUV',   doors:'4', fuel:'Elétrico' },
+];
+
+const LOADING_TASKS_BUYER = [
+  { text:'47 postos mapeados perto de você', sub:'Santo Amaro, São Paulo - SP' },
+  { text:'Maior frequência de uso analisada', sub:'De Segunda a Sexta-Feira, 3 rotinas' },
+  { text:'Principais veículos dentro do perfil', sub:'Troca, de 90 a 120 mil, SUV compacto' },
+  { text:'Calculando a melhor opção…', sub:'Aguarde...' },
+];
+
+const LOADING_TASKS_OWNER = [
+  { text:'Veículo registrado com sucesso', sub:'Configurações aplicadas' },
+  { text:'47 postos mapeados perto de você', sub:'Santo Amaro, São Paulo - SP' },
+  { text:'Maior frequência de uso analisada', sub:'De Segunda a Sexta-Feira, 3 rotinas' },
+  { text:'Calculando a melhor opção…', sub:'Aguarde...' },
+];
+
+const SUGGESTED_CARS_BUYER = [
+  { name:'Yuan Pro 2026', brand:'BYD', type:'SUV', doors:'4', fuel:'Elétrico', emoji:'🚙' },
+  { name:'EX30 2025',     brand:'Volvo', type:'SUV', doors:'4', fuel:'Elétrico', emoji:'🚙' },
+];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let flow      = null;   // 'comprador' | 'proprietario'
+let selCarId  = null;
+let selCar    = null;
+
+/* ══════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════ */
+let histStack = ['s-splash'];
+
+function goTo(id, replace = false) {
+  const current = histStack[histStack.length - 1];
+  if (current === id) return;
+  const currEl = document.getElementById(current);
+  const nextEl = document.getElementById(id);
+  currEl?.classList.remove('active');
+  currEl?.classList.add('exit');
+  nextEl?.classList.remove('exit');
+  nextEl?.classList.add('active');
+  setTimeout(() => currEl?.classList.remove('exit'), 420);
+  if (replace) histStack[histStack.length - 1] = id;
+  else histStack.push(id);
+}
+
+function goBack() {
+  if (histStack.length <= 1) return;
+  const current = histStack.pop();
+  const prev    = histStack[histStack.length - 1];
+  const currEl  = document.getElementById(current);
+  const prevEl  = document.getElementById(prev);
+  currEl?.classList.remove('active');
+  currEl?.classList.add('exit');
+  setTimeout(() => currEl?.classList.remove('exit'), 420);
+  prevEl?.classList.remove('exit');
+  prevEl?.classList.add('active');
+}
+
+/* ══════════════════════════════════════════════
+   DOTS HELPER
+══════════════════════════════════════════════ */
+function renderDots(containerId, total, active) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<div class="ob-dot${i === active ? ' active' : ''}"></div>`
+  ).join('');
+}
+
+/* ══════════════════════════════════════════════
+   CAR LIST
+══════════════════════════════════════════════ */
+function fuelTag(f) {
+  if (f === 'Elétrico') return '<span class="ob-tag gr">Elétrico</span>';
+  return '<span class="ob-tag or">Híbrido</span>';
+}
+function typeTag(t) {
+  const cls = { 'Hatch':'bl', 'SUV':'pu', 'Sedã':'gy' }[t] || 'gy';
+  return `<span class="ob-tag ${cls}">${t}</span>`;
+}
+
+function renderCarList(q = '') {
+  const list = document.getElementById('carList');
+  const filtered = q
+    ? CARS.filter(c => (c.name + c.brand).toLowerCase().includes(q.toLowerCase()))
+    : CARS;
+  list.innerHTML = filtered.map(c => `
+    <div class="ob-car${selCarId === c.id ? ' sel' : ''}" data-car-id="${c.id}">
+      <div class="ob-car-l">
+        <h4>${c.name}</h4>
+        <span>${c.brand}</span>
+        <div class="ob-tags">
+          ${typeTag(c.type)}
+          <span class="ob-tag gy">${c.doors} portas</span>
+          ${fuelTag(c.fuel)}
+        </div>
+      </div>
+    </div>`).join('');
+
+  list.querySelectorAll('.ob-car').forEach(el => {
+    el.addEventListener('click', () => {
+      selCarId = el.dataset.carId;
+      selCar   = CARS.find(c => c.id === selCarId);
+      list.querySelectorAll('.ob-car').forEach(x => x.classList.remove('sel'));
+      el.classList.add('sel');
+      document.getElementById('btnModelo').disabled = false;
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════
+   VEHICLE CARD RENDERER
+══════════════════════════════════════════════ */
+function vcardHTML(car, year = '') {
+  return `
+    <div class="ob-vcard-brand">${car.brand}</div>
+    <div class="ob-vcard-name">${car.name}${year ? ' ' + year : ''}</div>
+    <div class="ob-tags">
+      ${typeTag(car.type)}
+      <span class="ob-tag gy">${car.doors} portas</span>
+      ${fuelTag(car.fuel)}
+    </div>`;
+}
+
+/* ══════════════════════════════════════════════
+   YEAR / MODEL SELECT
+══════════════════════════════════════════════ */
+function populateYear(selectId) {
+  const sel = document.getElementById(selectId);
+  const cur = new Date().getFullYear();
+  sel.innerHTML = Array.from({ length: 6 }, (_, i) => {
+    const y = cur - i;
+    return `<option value="${y}">${y}/${y + 1}</option>`;
+  }).join('');
+}
+
+function populateModel(selectId, car) {
+  const variants = {
+    'dolphin-mini': ['Dolphin Mini Padrão', 'Dolphin Mini Plus'],
+    'dolphin-plus': ['Dolphin Plus Dynamic', 'Dolphin Plus Design'],
+    'yuan-pro':     ['Yuan Pro Sport', 'Yuan Pro Design', 'Yuan Pro Premium'],
+    'seal':         ['Seal Design', 'Seal AWD'],
+    'ora03':        ['Ora 03 Skin', 'Ora 03 Ultra'],
+    'ex30':         ['EX30 Core', 'EX30 Plus', 'EX30 Ultra'],
+    'kwid-etech':   ['Kwid E-Tech Intense', 'Kwid E-Tech Zen'],
+    'model3':       ['Model 3 Standard', 'Model 3 Long Range', 'Model 3 Performance'],
+    'ioniq5':       ['IONIQ 5 Essential', 'IONIQ 5 Premium'],
+    'id4':          ['ID.4 Pure', 'ID.4 Pro'],
+    'bolt':         ['Bolt EV LT', 'Bolt EV Premier'],
+    'ec6':          ['EC6 Confort', 'EC6 Premium'],
+  };
+  const sel = document.getElementById(selectId);
+  const opts = variants[car?.id] || [car?.name || ''];
+  sel.innerHTML = opts.map(o => `<option>${o}</option>`).join('');
+}
+
+/* ══════════════════════════════════════════════
+   LOADING ANIMATION
+══════════════════════════════════════════════ */
+function runLoading(tasks, onDone) {
+  const list = document.getElementById('ldList');
+  const fill = document.getElementById('ldFill');
+  const dots = document.getElementById('ldDots');
+
+  // Animated dots
+  let d = 0;
+  const dotAnim = setInterval(() => {
+    d = (d + 1) % 4;
+    dots.textContent = '.'.repeat(d);
+  }, 400);
+
+  // Render all as pending
+  list.innerHTML = tasks.map((t, i) => `
+    <div class="ld-item pending" id="ldi-${i}">
+      <div class="ld-ic">○</div>
+      <div>
+        <div style="font-weight:600">${t.text}</div>
+        <div style="font-size:.7rem;color:var(--muted);margin-top:2px">${t.sub}</div>
+      </div>
+    </div>`).join('');
+
+  let idx = 0;
+  function step() {
+    if (idx >= tasks.length) {
+      clearInterval(dotAnim);
+      dots.textContent = '';
+      setTimeout(onDone, 600);
+      return;
+    }
+    const el = document.getElementById(`ldi-${idx}`);
+    el.className = 'ld-item running';
+    el.querySelector('.ld-ic').textContent = '…';
+    fill.style.width = `${Math.round((idx / tasks.length) * 85)}%`;
+
+    setTimeout(() => {
+      el.className = 'ld-item done';
+      el.querySelector('.ld-ic').textContent = '✓';
+      fill.style.width = `${Math.round(((idx + 1) / tasks.length) * 100)}%`;
+      idx++;
+      setTimeout(step, 500);
+    }, 900 + Math.random() * 400);
+  }
+  setTimeout(step, 400);
+}
+
+/* ══════════════════════════════════════════════
+   RESULT SCREEN
+══════════════════════════════════════════════ */
+function renderResult() {
+  const body = document.getElementById('resBody');
+  const btn  = document.getElementById('btnEnterApp');
+
+  if (flow === 'comprador') {
+    btn.textContent = 'Entrar em contato';
+    const car = SUGGESTED_CARS_BUYER[0];
+    body.innerHTML = `
+      <div class="res-car-card">
+        <div class="res-car-emoji">${car.emoji}</div>
+        <div>
+          <div class="res-car-brand">${car.brand}</div>
+          <div class="res-car-name">${car.name}</div>
+          <div class="ob-tags">
+            ${typeTag(car.type)}
+            <span class="ob-tag gy">${car.doors} portas</span>
+            ${fuelTag(car.fuel)}
+          </div>
+        </div>
+      </div>`;
+    document.getElementById('verMais').style.display = 'block';
+  } else {
+    btn.textContent = 'Entrar no aplicativo';
+    document.getElementById('verMais').style.display = 'none';
+    const items = [
+      { done:true,  icon:'✓', h:'47 postos mapeados perto de você',       p:'Santo Amaro, São Paulo - SP' },
+      { done:true,  icon:'✓', h:'Maior frequência de uso analisada',       p:'De Segunda a Sexta-Feira, 3 rotinas' },
+      { done:true,  icon:'✓', h:'Principais veículos dentro do perfil',    p:`Troca, de 90 a 120 mil, ${selCar?.type || 'SUV'} compacto` },
+      { done:false, icon:'○', h:'Calculando a melhor opção…',              p:'Aguarde...' },
+    ];
+    body.innerHTML = items.map(it => `
+      <div class="res-item">
+        <div class="res-ic ${it.done ? 'done' : 'spin'}">${it.icon}</div>
+        <div class="res-txt">
+          <h4>${it.h}</h4>
+          <p>${it.p}</p>
+        </div>
+      </div>`).join('');
+  }
+}
+
+/* ══════════════════════════════════════════════
+   WIRING
+══════════════════════════════════════════════ */
+
+// Splash
+document.getElementById('btnStart').addEventListener('click', () => goTo('s-objetivo'));
+document.getElementById('btnLogin').addEventListener('click', () => {
+  sessionStorage.setItem('skipOnboarding', '1');
+  location.href = 'mobile.html';
+});
+
+// Objetivo
+['optComprador','optProprietario'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    document.querySelectorAll('.ob-option').forEach(o => o.classList.remove('sel'));
+    document.getElementById(id).classList.add('sel');
+    flow = document.getElementById(id).dataset.v;
+    document.getElementById('btnObjetivo').disabled = false;
+  });
+});
+document.getElementById('btnObjetivo').addEventListener('click', () => {
+  if (flow === 'comprador') {
+    renderDots('rotinaDots', 3, 0);
+    goTo('s-rotina');
+  } else {
+    renderCarList();
+    goTo('s-modelo');
+  }
+});
+document.getElementById('bkObjetivo').addEventListener('click', goBack);
+
+// Modelo
+document.getElementById('carSearch').addEventListener('input', e => renderCarList(e.target.value));
+document.getElementById('btnModelo').addEventListener('click', () => {
+  document.getElementById('compVcard').innerHTML = vcardHTML(selCar);
+  populateYear('vYear');
+  populateModel('vModel', selCar);
+  goTo('s-complementar');
+});
+document.getElementById('bkModelo').addEventListener('click', goBack);
+
+// Complementar
+document.getElementById('btnComplementar').addEventListener('click', () => {
+  const year = document.getElementById('vYear').value.split('/')[0];
+  document.getElementById('confVcard').innerHTML = vcardHTML(selCar, year);
+  goTo('s-conf-veiculo');
+});
+document.getElementById('bkComplementar').addEventListener('click', goBack);
+
+// Confirmação veículo
+document.getElementById('btnConfVeiculo').addEventListener('click', () => goTo('s-infos-comp'));
+document.getElementById('btnTrocarVeiculo').addEventListener('click', () => {
+  histStack = histStack.filter(id => id !== 's-complementar' && id !== 's-conf-veiculo');
+  goBack();
+  goTo('s-modelo', true);
+});
+document.getElementById('bkConfVeiculo').addEventListener('click', goBack);
+
+// Infos complementares
+document.getElementById('btnInfosComp').addEventListener('click', () => {
+  renderDots('rotinaDots', 3, 1);
+  goTo('s-rotina');
+});
+document.getElementById('bkInfosComp').addEventListener('click', goBack);
+
+// Rotina
+document.getElementById('btnRotina').addEventListener('click', () => {
+  if (flow === 'comprador') {
+    renderDots('proximoDots', 3, 1);
+    goTo('s-proximo');
+  } else {
+    goTo('s-loading');
+    runLoading(LOADING_TASKS_OWNER, () => {
+      renderResult();
+      goTo('s-result');
+    });
+  }
+});
+document.getElementById('bkRotina').addEventListener('click', goBack);
+
+// Próximo carro (comprador)
+document.getElementById('negSim').addEventListener('click', () => {
+  document.getElementById('negSim').classList.add('on');
+  document.getElementById('negNao').classList.remove('on');
+});
+document.getElementById('negNao').addEventListener('click', () => {
+  document.getElementById('negNao').classList.add('on');
+  document.getElementById('negSim').classList.remove('on');
+});
+document.getElementById('budgetRange').addEventListener('input', e => {
+  const v = +e.target.value;
+  document.getElementById('rangeVal').textContent =
+    v >= 800 ? 'Acima de R$ 800 mil' : `De R$ ${Math.max(60, v - 30)} a R$ ${v} mil`;
+});
+document.getElementById('btnProximo').addEventListener('click', () => {
+  goTo('s-loading');
+  runLoading(LOADING_TASKS_BUYER, () => {
+    renderResult();
+    goTo('s-result');
+  });
+});
+document.getElementById('bkProximo').addEventListener('click', goBack);
+
+// Resultado
+document.getElementById('btnEnterApp').addEventListener('click', () => {
+  sessionStorage.setItem('onboardingComplete', '1');
+  sessionStorage.setItem('onboardingFlow', flow);
+  location.href = 'mobile.html';
+});
+document.getElementById('verMais').addEventListener('click', () => {
+  alert('Em breve: mais sugestões personalizadas!');
+});
+</script>
+</body>
+</html>
