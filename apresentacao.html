@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>FLUI – Apresentação Grupo 11</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7B2FBE;
+      --purple-light: #9D4EDD;
+      --purple-dark: #4B0082;
+      --bg: #080e19;
+      --bg2: #0f1a2e;
+      --card: #121c30;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --green: #4ade80;
+      --accent: #c77dff;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
+
+    /* ── Slides ── */
+    .deck { width: 100vw; height: 100vh; position: relative; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 60px 80px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .4s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: all; }
+
+    /* ── Nav ── */
+    .nav {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 16px; z-index: 99;
+      background: rgba(15,26,46,.85); border: 1px solid rgba(123,47,190,.4);
+      border-radius: 50px; padding: 10px 24px; backdrop-filter: blur(10px);
+    }
+    .nav button {
+      background: none; border: none; color: var(--text); cursor: pointer;
+      font-size: 1.1rem; padding: 4px 12px; border-radius: 20px; transition: background .2s;
+    }
+    .nav button:hover { background: rgba(123,47,190,.3); }
+    .nav button:disabled { opacity: .3; cursor: default; }
+    .nav .counter { font-size: .85rem; color: var(--muted); min-width: 60px; text-align: center; }
+
+    /* ── Progress bar ── */
+    .progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--purple), var(--accent)); transition: width .4s ease; }
+
+    /* ── Speaker badge ── */
+    .speaker {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(123,47,190,.25); border: 1px solid rgba(123,47,190,.5);
+      border-radius: 20px; padding: 6px 16px; font-size: .82rem; color: var(--accent);
+      margin-bottom: 24px; text-transform: uppercase; letter-spacing: .06em;
+    }
+    .speaker::before { content: '🎙️'; }
+
+    /* ── Typography ── */
+    .eyebrow { font-size: .8rem; text-transform: uppercase; letter-spacing: .12em; color: var(--accent); margin-bottom: 12px; }
+    h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; }
+    h2 { font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-weight: 700; line-height: 1.2; }
+    h3 { font-size: 1.25rem; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+    p  { font-size: clamp(.95rem, 1.8vw, 1.15rem); color: var(--muted); line-height: 1.7; max-width: 780px; }
+    strong { color: var(--text); }
+    .highlight { color: var(--purple-light); }
+
+    /* ── Logo ── */
+    .logo-big { height: 70px; margin-bottom: 24px; filter: drop-shadow(0 0 30px rgba(123,47,190,.5)); }
+
+    /* ── Cards grid ── */
+    .grid { display: grid; gap: 20px; width: 100%; max-width: 1000px; margin-top: 32px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .card {
+      background: var(--card); border: 1px solid rgba(123,47,190,.3);
+      border-radius: 16px; padding: 28px 24px;
+    }
+    .card .icon { font-size: 2rem; margin-bottom: 12px; }
+
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; width: 100%; max-width: 700px; margin-top: 28px; }
+    .step { display: flex; align-items: flex-start; gap: 16px; }
+    .step-num {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .9rem; flex-shrink: 0;
+    }
+    .step-text { font-size: .98rem; color: var(--muted); line-height: 1.6; padding-top: 6px; }
+    .step-text strong { color: var(--text); }
+
+    /* ── Quote ── */
+    .quote {
+      border-left: 4px solid var(--purple-light); padding: 20px 28px;
+      background: rgba(123,47,190,.08); border-radius: 0 12px 12px 0;
+      font-size: 1.1rem; color: var(--text); line-height: 1.7;
+      max-width: 780px; margin-top: 20px;
+    }
+
+    /* ── Big number ── */
+    .stats { display: flex; gap: 40px; margin-top: 36px; flex-wrap: wrap; justify-content: center; }
+    .stat { text-align: center; }
+    .stat .num { font-size: 3rem; font-weight: 800; color: var(--purple-light); line-height: 1; }
+    .stat .label { font-size: .85rem; color: var(--muted); margin-top: 6px; }
+
+    /* ── Pill tags ── */
+    .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .tag {
+      background: rgba(123,47,190,.2); border: 1px solid rgba(123,47,190,.4);
+      border-radius: 20px; padding: 6px 16px; font-size: .85rem; color: var(--accent);
+    }
+
+    /* ── Cover slide extras ── */
+    .cover-sub { font-size: 1.05rem; color: var(--muted); margin-top: 16px; }
+    .members { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; justify-content: center; }
+    .member {
+      background: var(--card); border: 1px solid rgba(123,47,190,.3);
+      border-radius: 12px; padding: 12px 20px; text-align: center;
+    }
+    .member .name { font-weight: 600; font-size: .95rem; }
+    .member .role { font-size: .78rem; color: var(--accent); margin-top: 4px; }
+
+    /* ── CTA button ── */
+    .cta {
+      display: inline-block; margin-top: 28px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      color: #fff; font-weight: 700; text-decoration: none;
+      padding: 14px 36px; border-radius: 40px; font-size: 1rem;
+      box-shadow: 0 0 30px rgba(123,47,190,.4); transition: transform .2s;
+    }
+    .cta:hover { transform: scale(1.04); }
+
+    /* ── Two col layout ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; width: 100%; max-width: 1000px; align-items: center; }
+
+    /* ── Slide backgrounds ── */
+    #s1  { background: radial-gradient(ellipse at 60% 40%, rgba(123,47,190,.25) 0%, transparent 65%), var(--bg); text-align: center; }
+    #s2  { background: var(--bg); }
+    #s3  { background: var(--bg2); text-align: center; }
+    #s4  { background: var(--bg); }
+    #s5  { background: var(--bg2); }
+    #s6  { background: var(--bg); text-align: center; }
+    #s7  { background: var(--bg2); }
+    #s8  { background: var(--bg); text-align: center; }
+    #s9  { background: var(--bg2); }
+    #s10 { background: radial-gradient(ellipse at 40% 60%, rgba(123,47,190,.3) 0%, transparent 65%), var(--bg); text-align: center; }
+
+    @media (max-width: 700px) {
+      .slide { padding: 40px 24px; }
+      .grid-2, .grid-3, .two-col { grid-template-columns: 1fr; }
+      .stats { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1. CAPA -->
+  <section class="slide active" id="s1">
+    <div class="eyebrow">Enterprise Challenge · Etapa 3 · Grupo 11</div>
+    <img src="assets/flui-logo-purple.svg" alt="Flui" class="logo-big"/>
+    <h1>A plataforma que simplifica<br/><span class="highlight">a escolha do carro elétrico</span></h1>
+    <p class="cover-sub">Assessoria digital personalizada para a nova mobilidade sustentável</p>
+    <div class="members">
+      <div class="member"><div class="name">Gabriel Pereira</div><div class="role">Desenvolvimento</div></div>
+      <div class="member"><div class="name">Hannya Cavalcante</div><div class="role">Design & UX</div></div>
+      <div class="member"><div class="name">Mariana Nikaido</div><div class="role">Produto & Marketing</div></div>
+    </div>
+  </section>
+
+  <!-- 2. O PROBLEMA -->
+  <section class="slide" id="s2">
+    <div class="speaker">Mariana</div>
+    <div class="eyebrow">O Problema</div>
+    <h2>O mercado elétrico cresce.<br/>Mas a <span class="highlight">insegurança do consumidor</span> também.</h2>
+    <div class="grid grid-3" style="margin-top:32px;">
+      <div class="card">
+        <div class="icon">😰</div>
+        <h3>Excesso de informação</h3>
+        <p>Consumidores se perdem entre autonomia, tecnologias, conectores e preços.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🤷</div>
+        <h3>Falta de orientação</h3>
+        <p>Não existe uma solução que combine perfil do usuário com recomendação personalizada.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🚫</div>
+        <h3>Barreiras na decisão</h3>
+        <p>Medo de fazer a escolha errada paralisa a transição para mobilidade sustentável.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">+40%</div><div class="label">crescimento de elétricos no Brasil (2024)</div></div>
+      <div class="stat"><div class="num">72%</div><div class="label">desistem da compra por falta de informação</div></div>
+    </div>
+  </section>
+
+  <!-- 3. A SOLUÇÃO -->
+  <section class="slide" id="s3">
+    <div class="speaker">Hannya</div>
+    <div class="eyebrow">A Solução</div>
+    <img src="assets/flui-logo-purple.svg" alt="Flui" style="height:52px; margin-bottom:16px;"/>
+    <h2>Não é um catálogo.<br/>É uma <span class="highlight">assessoria digital</span>.</h2>
+    <p style="margin-top:16px;">A FLUI compreende quem você é, como você vive e o que você precisa — e então recomenda o veículo certo com dados claros, comparações simples e uma IA sempre disponível.</p>
+    <div class="tags">
+      <span class="tag">Web & Mobile</span>
+      <span class="tag">Onboarding personalizado</span>
+      <span class="tag">IA conversacional (Lu)</span>
+      <span class="tag">Comparação inteligente</span>
+      <span class="tag">Painel administrativo</span>
+      <span class="tag">Design centrado no usuário</span>
+    </div>
+  </section>
+
+  <!-- 4. COMO FUNCIONA -->
+  <section class="slide" id="s4">
+    <div class="speaker">Gabriel</div>
+    <div class="eyebrow">Como Funciona</div>
+    <h2>Jornada do <span class="highlight">motorista</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Onboarding etnográfico</strong> — A plataforma coleta dados de rotina, orçamento, distância média, estrutura de recarga e composição familiar.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Recomendação personalizada</strong> — O algoritmo cruza o perfil com o catálogo e apresenta os modelos mais compatíveis, rankeados por relevância.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Comparação objetiva</strong> — Autonomia, custo-benefício, tecnologia e comodidades lado a lado, sem tecnicismos desnecessários.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Lu responde</strong> — A assistente de IA esclarece dúvidas em linguagem natural, tornando o processo acessível para qualquer perfil.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text"><strong>Decisão com confiança</strong> — O usuário sai sabendo exatamente por que aquele veículo é o certo para ele.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. LU – IA -->
+  <section class="slide" id="s5">
+    <div class="speaker">Hannya</div>
+    <div class="two-col">
+      <div>
+        <div class="eyebrow">Diferencial</div>
+        <h2>Lu, a assistente<br/><span class="highlight">com inteligência artificial</span></h2>
+        <p style="margin-top:16px;">Baseada em processamento de linguagem natural, a Lu responde perguntas sobre autonomia, recarga, incentivos fiscais e diferenças entre tecnologias — de forma simples, rápida e sem jargões técnicos.</p>
+        <div class="steps" style="margin-top:24px;">
+          <div class="step">
+            <div class="step-num">✓</div>
+            <div class="step-text">Disponível 24h, sem tempo de espera</div>
+          </div>
+          <div class="step">
+            <div class="step-num">✓</div>
+            <div class="step-text">Linguagem acessível para qualquer perfil</div>
+          </div>
+          <div class="step">
+            <div class="step-num">✓</div>
+            <div class="step-text">Escalável sem custo adicional por atendimento</div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;">
+        <div style="font-size:4rem;">🤖</div>
+        <h3 style="font-size:1.4rem;">Lu</h3>
+        <p>"Qual a diferença entre carro elétrico e híbrido?"</p>
+        <div style="background:rgba(123,47,190,.2); border-radius:12px; padding:14px 18px; font-size:.9rem; color:var(--text); text-align:left; margin-top:8px;">
+          Um elétrico funciona 100% na bateria. Um híbrido combina motor elétrico e a combustão — ideal para quem percorre longas distâncias sem infraestrutura de recarga próxima. Quer que eu te indique qual combina com sua rotina?
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. DEMO AO VIVO -->
+  <section class="slide" id="s6">
+    <div class="speaker">Gabriel</div>
+    <div class="eyebrow">Demo ao vivo</div>
+    <h2>Acesse agora na<br/><span class="highlight">mesma rede Wi-Fi</span></h2>
+    <p style="margin-top:12px;">Escaneie ou digite o endereço no navegador do seu celular</p>
+    <div class="grid grid-3" style="margin-top:28px; max-width:860px;">
+      <div class="card" style="text-align:center;">
+        <div class="icon">📱</div>
+        <h3>App do Motorista</h3>
+        <p style="font-size:.85rem; margin-top:8px; color:var(--accent);">192.168.15.4:4173<br/>/mobile.html</p>
+        <a href="/mobile.html" class="cta" style="margin-top:16px; font-size:.85rem; padding:10px 20px;">Abrir</a>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="icon">🌐</div>
+        <h3>Landing Page</h3>
+        <p style="font-size:.85rem; margin-top:8px; color:var(--accent);">192.168.15.4:4173<br/>/index.html</p>
+        <a href="/index.html" class="cta" style="margin-top:16px; font-size:.85rem; padding:10px 20px;">Abrir</a>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="icon">🛠️</div>
+        <h3>Painel Admin</h3>
+        <p style="font-size:.85rem; margin-top:8px; color:var(--accent);">192.168.15.4:4173<br/>/admin.html</p>
+        <a href="/admin.html" class="cta" style="margin-top:16px; font-size:.85rem; padding:10px 20px;">Abrir</a>
+      </div>
+    </div>
+    <p style="margin-top:16px; font-size:.85rem;">Login admin: <strong>admin@flui.com</strong> / <strong>123456</strong></p>
+  </section>
+
+  <!-- 7. PAINEL ADMIN -->
+  <section class="slide" id="s7">
+    <div class="speaker">Mariana</div>
+    <div class="eyebrow">Área Administrativa</div>
+    <h2>Gestão completa<br/>para o <span class="highlight">staff</span></h2>
+    <div class="grid grid-2" style="margin-top:28px; max-width:860px;">
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Métricas em tempo real</h3>
+        <p>Acompanhamento de usuários cadastrados, acessos, interações com a Lu e comparações realizadas.</p>
+      </div>
+      <div class="card">
+        <div class="icon">👥</div>
+        <h3>Gestão de usuários</h3>
+        <p>Visualização de perfis, histórico de recomendações e comportamento de navegação.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔍</div>
+        <h3>Análise de dados</h3>
+        <p>Relatórios de uso para orientar melhorias contínuas na experiência da plataforma.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚙️</div>
+        <h3>Configurações</h3>
+        <p>Gerenciamento de catálogo de veículos, conteúdo educativo e parâmetros da IA.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. MARKETING -->
+  <section class="slide" id="s8">
+    <div class="speaker">Hannya</div>
+    <div class="eyebrow">Estratégia de Marketing</div>
+    <h2>Pull <span class="highlight">+</span> Push</h2>
+    <div class="grid grid-2" style="margin-top:28px; max-width:860px;">
+      <div class="card">
+        <div class="icon">🧲</div>
+        <h3>Pull — Atração orgânica</h3>
+        <div class="steps" style="margin-top:12px;">
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">Conteúdo educativo sobre mobilidade elétrica</div></div>
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">SEO e otimização para mecanismos de busca</div></div>
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">Blog, vídeos e redes sociais educativas</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="icon">📣</div>
+        <h3>Push — Aquisição ativa</h3>
+        <div class="steps" style="margin-top:12px;">
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">Campanhas segmentadas por perfil de consumidor</div></div>
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">Parcerias com montadoras e concessionárias</div></div>
+          <div class="step"><div class="step-num" style="min-width:28px; height:28px; font-size:.8rem;">✓</div><div class="step-text">Retargeting e e-mail marketing personalizado</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. DECISÕES DO PROJETO -->
+  <section class="slide" id="s9">
+    <div class="speaker">Gabriel</div>
+    <div class="eyebrow">Tomadas de Decisão</div>
+    <h2>Por que cada escolha<br/>foi <span class="highlight">intencional</span></h2>
+    <div class="steps" style="margin-top:24px;">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Assessoria, não catálogo</strong> — A dor real não era falta de opções, era excesso de informações sem orientação.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Onboarding etnográfico</strong> — Dados de rotina e contexto geram recomendações mais assertivas e reduzem sobrecarga cognitiva.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Web + Mobile</strong> — Experiência omnichannel para atender diferentes contextos de uso sem fricção.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Lu com IA</strong> — Atendimento escalável e acessível, capaz de traduzir conceitos técnicos para linguagem simples.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text"><strong>Área administrativa</strong> — Decisões baseadas em dados reais de uso, não suposições.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. ENCERRAMENTO -->
+  <section class="slide" id="s10">
+    <div class="speaker">Todos</div>
+    <div class="eyebrow">Conclusão</div>
+    <img src="assets/flui-logo-purple.svg" alt="Flui" class="logo-big"/>
+    <h2>Tecnologia, IA e design centrado<br/>no usuário para tornar a <span class="highlight">mobilidade sustentável</span><br/>mais simples e acessível.</h2>
+    <div class="quote">
+      "Mais do que indicar veículos, a FLUI gera confiança, reduz a insegurança dos consumidores e aproxima as pessoas do futuro da mobilidade."
+    </div>
+    <div class="members" style="margin-top:32px;">
+      <div class="member"><div class="name">Gabriel Pereira</div><div class="role">oli.g@outlook.com</div></div>
+      <div class="member"><div class="name">Hannya Cavalcante</div><div class="role">Hannyacavalcante@hotmail.com</div></div>
+      <div class="member"><div class="name">Mariana Nikaido</div><div class="role">mariananikaido04@gmail.com</div></div>
+    </div>
+    <p style="margin-top:20px; font-size:.85rem;">Grupo 11 · Enterprise Challenge · São Paulo – SP</p>
+  </section>
+
+</div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <button id="btnPrev" onclick="go(-1)" disabled>&#8592;</button>
+  <span class="counter" id="counter">1 / 10</span>
+  <button id="btnNext" onclick="go(1)">&#8594;</button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let cur = 0;
+
+  function go(dir) {
+    slides[cur].classList.remove('active');
+    cur = Math.max(0, Math.min(total - 1, cur + dir));
+    slides[cur].classList.add('active');
+    document.getElementById('counter').textContent = `${cur + 1} / ${total}`;
+    document.getElementById('btnPrev').disabled = cur === 0;
+    document.getElementById('btnNext').disabled = cur === total - 1;
+    document.getElementById('progress').style.width = `${((cur + 1) / total) * 100}%`;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    go(-1);
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+  document.addEventListener('touchend',   e => {
+    const dx = tx - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) go(dx > 0 ? 1 : -1);
+  });
+
+  go(0);
+</script>
+
+</body>
+</html>
