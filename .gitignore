@@ -1,8 +1,8 @@
 ﻿node_modules/
 .env
-.env.local
 .DS_Store
 Thumbs.db
 .claude/
 generate_qr.py
 generate_qr.swift
+backend/flui.db
