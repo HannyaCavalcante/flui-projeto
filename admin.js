@@ -10,7 +10,13 @@ function authHeader() {
   return t ? { Authorization: `Bearer ${t}` } : {};
 }
 
+const DEMO_TOKEN = 'demo-token';
+const DEMO_USER  = { name: 'Admin Demo', role: 'admin', email: 'admin@flui.com' };
+
+function isDemoMode() { return getToken() === DEMO_TOKEN; }
+
 async function apiFetch(path, opts = {}) {
+  if (isDemoMode()) throw new Error('demo');
   const res  = await fetch(`${API}${path}`, {
     ...opts,
     headers: { 'Content-Type': 'application/json', ...authHeader(), ...(opts.headers || {}) },
@@ -39,6 +45,10 @@ let reservChart   = null;
 /* ─── Bootstrap ─── */
 (async function init() {
   const token = getToken();
+  if (token === DEMO_TOKEN) {
+    showPanel(DEMO_USER);
+    return;
+  }
   if (token) {
     try {
       const user = await apiFetch('/auth/me');
@@ -113,6 +123,13 @@ loginForm?.addEventListener('submit', async e => {
   btn.textContent = 'Entrando…';
   btn.disabled    = true;
   try {
+    /* Modo demo sem backend */
+    if (email === 'admin@flui.com' && password === '123456') {
+      setToken(DEMO_TOKEN);
+      sessionStorage.setItem('fluiAdminUser', JSON.stringify(DEMO_USER));
+      showPanel(DEMO_USER);
+      return;
+    }
     const data = await apiFetch('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
@@ -126,7 +143,11 @@ loginForm?.addEventListener('submit', async e => {
     sessionStorage.setItem('fluiAdminUser', JSON.stringify(data.user));
     showPanel(data.user);
   } catch (err) {
-    loginError.textContent = err.message;
+    if (err.message === 'demo' || err.message.includes('fetch') || err.message.includes('Failed')) {
+      loginError.textContent = 'Use admin@flui.com / 123456 para testar';
+    } else {
+      loginError.textContent = err.message;
+    }
   } finally {
     btn.textContent = 'Entrar';
     btn.disabled    = false;
@@ -301,6 +322,11 @@ function editStation(id) {
 
 async function deleteStation(id) {
   if (!confirm('Excluir este ponto de recarga?')) return;
+  if (isDemoMode()) {
+    adminStations = adminStations.filter(s => s.id !== id);
+    render();
+    return;
+  }
   try {
     await apiFetch(`/stations/${id}`, { method: 'DELETE' });
     adminStations = adminStations.filter(s => s.id !== id);
@@ -312,13 +338,14 @@ async function deleteStation(id) {
 }
 
 async function updateAvailability(id, value) {
+  const idx = adminStations.findIndex(s => s.id === id);
+  if (idx >= 0) adminStations[idx].available = Number(value);
+  if (isDemoMode()) return;
   try {
     await apiFetch(`/admin/stations/${id}/availability`, {
       method: 'PATCH',
       body: JSON.stringify({ available: Number(value) }),
     });
-    const idx = adminStations.findIndex(s => s.id === id);
-    if (idx >= 0) adminStations[idx].available = Number(value);
   } catch (err) {
     alert(`Erro ao atualizar disponibilidade: ${err.message}`);
   }
@@ -349,21 +376,33 @@ stationForm?.addEventListener('submit', async e => {
   btn.disabled    = true;
 
   try {
-    if (existingId) {
+    if (isDemoMode()) {
+      if (existingId) {
+        const idx = adminStations.findIndex(s => s.id === existingId);
+        if (idx >= 0) adminStations[idx] = { ...adminStations[idx], ...payload };
+      } else {
+        adminStations = [{ ...payload, id: `demo-${Date.now()}`, rating: 5, reviews: [] }, ...adminStations];
+      }
+      resetForm();
+      render();
+    } else if (existingId) {
       const updated = await apiFetch(`/stations/${existingId}`, {
         method: 'PUT', body: JSON.stringify(payload),
       });
       const idx = adminStations.findIndex(s => s.id === existingId);
       if (idx >= 0) adminStations[idx] = { ...adminStations[idx], ...updated };
+      resetForm();
+      render();
+      loadMetrics();
     } else {
       const created = await apiFetch('/stations', {
         method: 'POST', body: JSON.stringify(payload),
       });
       adminStations = [created, ...adminStations];
+      resetForm();
+      render();
+      loadMetrics();
     }
-    resetForm();
-    render();
-    loadMetrics();
   } catch (err) {
     alert(`Erro: ${err.message}`);
   } finally {
